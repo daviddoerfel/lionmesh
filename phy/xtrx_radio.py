@@ -34,8 +34,8 @@ from dataclasses import dataclass
 @dataclass
 class XTRXConfig:
     # Frequency in Hz:
-    freq_hz:      float = 863e6        # 863 MHz EU Sub-GHz ISM (long range)
-    # freq_hz:    float = 2400e6       # 2.4 GHz ISM (higher throughput)
+    freq_hz:      float = 2400e6       # 2.4 GHz ISM — recommended (legal, no duty cycle)
+    # freq_hz:    float = 863e6        # 863 MHz — authorised deployments only (ETSI EN 300 220)
 
     # Channel bandwidth — must match phy_ofdm.set_bandwidth()
     # 5 MHz  → best range, ~9 Mbps @ MCS4   (default, Doodle Labs style)

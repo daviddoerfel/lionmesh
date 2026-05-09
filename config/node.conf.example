@@ -3,7 +3,7 @@
 
 [node]
 node_id   = lionmesh-a
-node_name = LION-ALPHA
+node_name = GHOST-ALPHA
 mesh_ip   = 10.41.0.1
 mesh_network = 10.41.0.0/16
 
@@ -15,9 +15,9 @@ mesh_network = 10.41.0.0/16
 [radio]
 mode         = wifi
 device_args  = driver=lime
-freq_hz      = 863000000
-bandwidth_hz = 5000000
-mcs          = 4
+freq_hz      = 2400000000         # 2400 MHz (recommended) or 863000000 (authorised deployments only)
+bandwidth_hz = 5000000            # 5 MHz → best range (+6 dB vs 20 MHz)
+mcs          = 4                  # 16-QAM 3/4 → 9 Mbps @ 5 MHz, good for 720p H.265
 tx_gain_db   = 50.0
 rx_gain_db   = 40.0
 
