@@ -62,7 +62,7 @@ header {
     color: var(--text1);
     border: 1px solid var(--border);
 }
-.radio-mode-badge.ghostlink { background: #0d2b1a; color: var(--green); border-color: #00e67640; }
+.radio-mode-badge.lionmesh { background: #0d2b1a; color: var(--green); border-color: #00e67640; }
 .radio-mode-badge.wifi      { background: #1a1e2b; color: var(--blue);  border-color: #40c4ff40; }
 
 .header-right {

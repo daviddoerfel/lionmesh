@@ -1,18 +1,18 @@
 """
-daemon/main.py — GhostLink Node Daemon
+daemon/main.py — LionMesh Node Daemon
 ========================================
 Entry point. Orchestrates all subsystems:
 
   Control plane  → LoRaManager  (868 MHz, Meshtastic, GPS broadcast)
   Position       → GpsManager   (gpsd)
-  Data plane     → RadioManager (GhostLink PHY or WiFi, selectable)
+  Data plane     → RadioManager (LionMesh PHY or WiFi, selectable)
   Node registry  → NodeRegistry (in-memory, updated by both planes)
   REST API       → FastAPI on port 8080
 
 Startup sequence:
   1. Load config (node.conf)
   2. Start GPS
-  3. Start Radio (GhostLink or WiFi)
+  3. Start Radio (LionMesh or WiFi)
   4. Start LoRa (Meshtastic)
   5. Start GPS broadcast loop (LoRa, every 30s)
   6. Start stale-node cleanup loop (every 60s)
@@ -65,7 +65,7 @@ def gps_broadcast_loop(gps, lora, registry, cfg, stop_evt: threading.Event):
     """
     interval = cfg.getint("gps", "gps_broadcast_interval", fallback=30)
     node_id   = cfg.get("node", "node_id",   fallback="unknown")
-    node_name = cfg.get("node", "node_name", fallback="GhostLink")
+    node_name = cfg.get("node", "node_name", fallback="LionMesh")
     mesh_ip   = cfg.get("node", "mesh_ip",   fallback="10.41.0.1")
 
     while not stop_evt.wait(interval):
@@ -144,7 +144,7 @@ def heartbeat_loop(radio: RadioManager, cfg: ConfigParser,
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="GhostLink Node Daemon")
+    parser = argparse.ArgumentParser(description="LionMesh Node Daemon")
     parser.add_argument("--config", default="config/node.conf",
                         help="Path to node.conf")
     args = parser.parse_args()
@@ -176,7 +176,7 @@ def main():
     except Exception as e:
         log.warning(f"GPS unavailable: {e}")
 
-    # ── Radio (GhostLink PHY or WiFi) ──
+    # ── Radio (LionMesh PHY or WiFi) ──
     radio = RadioManager(
         cfg    = cfg,
         on_rx  = lambda payload: on_data_rx(payload, registry),
@@ -215,9 +215,9 @@ def main():
     except Exception as e:
         log.warning(f"LoRa unavailable: {e} — control plane disabled")
 
-    # ── Video (GhostLink mode, if enabled) ──
+    # ── Video (LionMesh mode, if enabled) ──
     video = None
-    if radio.mode == "ghostlink":
+    if radio.mode == "lionmesh":
         try:
             from phy.video_pipe import VideoTX
             video = VideoTX(

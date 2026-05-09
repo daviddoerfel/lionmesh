@@ -1,23 +1,23 @@
 #!/bin/bash
-# setup/04_ghostlink.sh
-# GhostLink PHY installation script
+# setup/04_lionmesh.sh
+# LionMesh PHY installation script
 # Run AFTER 01_system.sh, 02_mesh_wifi.sh, 03_lora_meshtastic.sh
 #
 # Installs:
 #   - Python dependencies (numpy, scipy, fastapi, uvicorn)
 #   - SoapySDR + LimeSDR driver (optional, skip if wifi mode)
 #   - GStreamer H.265 pipeline (optional, for video TX)
-#   - ghostlink systemd service
+#   - lionmesh systemd service
 
 set -e
 
-INSTALL_DIR="/opt/ghostlink"
-CONFIG_DIR="/etc/ghostlink"
-SERVICE_FILE="/etc/systemd/system/ghostlink.service"
+INSTALL_DIR="/opt/lionmesh"
+CONFIG_DIR="/etc/lionmesh"
+SERVICE_FILE="/etc/systemd/system/lionmesh.service"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 
-echo "=== GhostLink Setup ==="
+echo "=== LionMesh Setup ==="
 echo "Repo:   $REPO_DIR"
 echo "Install: $INSTALL_DIR"
 echo ""
@@ -62,9 +62,9 @@ else
     echo "  Skipping GStreamer. Video TX will be unavailable."
 fi
 
-# ── Install GhostLink ─────────────────────────────────────────────────────────
+# ── Install LionMesh ─────────────────────────────────────────────────────────
 echo ""
-echo "[4/5] Installing GhostLink to $INSTALL_DIR..."
+echo "[4/5] Installing LionMesh to $INSTALL_DIR..."
 mkdir -p "$INSTALL_DIR"
 cp -r "$REPO_DIR"/* "$INSTALL_DIR/"
 
@@ -83,7 +83,7 @@ echo "[5/5] Installing systemd service..."
 
 cat > "$SERVICE_FILE" << EOF
 [Unit]
-Description=GhostLink Node Daemon
+Description=LionMesh Node Daemon
 After=network.target gpsd.service
 Wants=gpsd.service
 
@@ -101,17 +101,17 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable ghostlink
-echo "  Service installed. Start with: sudo systemctl start ghostlink"
-echo "  Logs: sudo journalctl -u ghostlink -f"
+systemctl enable lionmesh
+echo "  Service installed. Start with: sudo systemctl start lionmesh"
+echo "  Logs: sudo journalctl -u lionmesh -f"
 
 echo ""
-echo "=== GhostLink Setup Complete ==="
+echo "=== LionMesh Setup Complete ==="
 echo ""
 echo "Next steps:"
 echo "  1. Edit $CONFIG_DIR/node.conf"
 echo "     - Set node_id, node_name, mesh_ip"
-echo "     - Set [radio] mode = wifi OR ghostlink"
-echo "     - If ghostlink: set freq_hz, bandwidth_hz, mcs"
-echo "  2. sudo systemctl start ghostlink"
+echo "     - Set [radio] mode = wifi OR lionmesh"
+echo "     - If lionmesh: set freq_hz, bandwidth_hz, mcs"
+echo "  2. sudo systemctl start lionmesh"
 echo "  3. Open http://$(hostname -I | awk '{print $1}'):8080"

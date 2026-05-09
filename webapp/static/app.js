@@ -1,4 +1,4 @@
-// GhostLink WebApp
+// LionMesh WebApp
 // Polls /api/status, /api/nodes, /api/radio every 5-10 seconds.
 // Updates Leaflet map, node list, radio stats, and video panel.
 
@@ -70,7 +70,7 @@ async function fetchStatus() {
         const radio = data.radio || {};
         const badge = document.getElementById('radio-mode-badge');
         const mode  = (radio.mode || 'wifi').toLowerCase();
-        badge.textContent = mode === 'ghostlink' ? 'GhostLink PHY' : 'WiFi';
+        badge.textContent = mode === 'lionmesh' ? 'LionMesh PHY' : 'WiFi';
         badge.className   = `radio-mode-badge ${mode}`;
 
         // Radio panel
@@ -134,7 +134,7 @@ function renderNodeList(nodes) {
         const isOnline = node.online;
 
         const tags = [];
-        if (node.radio_mode === 'ghostlink' && node.mcs != null)
+        if (node.radio_mode === 'lionmesh' && node.mcs != null)
             tags.push(`<span class="node-tag mcs">MCS${node.mcs}</span>`);
         if (node.throughput_mbps != null)
             tags.push(`<span class="node-tag speed">${node.throughput_mbps} Mbps</span>`);

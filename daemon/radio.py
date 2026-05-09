@@ -10,10 +10,10 @@ Supports two modes, selected via node.conf [radio] mode:
     No LimeSDR required. Mesh routing handled by the OS (batctl).
     Video: GStreamer pipeline uses the batman-adv IP mesh directly.
 
-  ghostlink
-    GhostLink OFDM PHY via LimeSDR (Mini 2 / XTRX).
+  lionmesh
+    LionMesh OFDM PHY via LimeSDR (Mini 2 / XTRX).
     Custom PHY/MAC stack: phy_ofdm + mac_simple + xtrx_radio.
-    Video: routed over the GhostLink MAC datagram interface.
+    Video: routed over the LionMesh MAC datagram interface.
     Falls back to simulation mode if no hardware is detected.
 
 The daemon calls the same RadioManager API regardless of mode.
@@ -46,8 +46,8 @@ class RadioManager:
         self._cfg   = cfg
         self._on_rx = on_rx
         self._mode  = cfg.get("radio", "mode", fallback="wifi").strip().lower()
-        self._mac   = None    # GhostLink MACLayer (ghostlink mode only)
-        self._radio = None    # XTRXRadio (ghostlink mode only)
+        self._mac   = None    # LionMesh MACLayer (lionmesh mode only)
+        self._radio = None    # XTRXRadio (lionmesh mode only)
         self._running = False
 
         log.info(f"Radio mode: {self._mode}")
@@ -57,8 +57,8 @@ class RadioManager:
     def start(self) -> None:
         """Start the radio subsystem."""
         self._running = True
-        if self._mode == "ghostlink":
-            self._start_ghostlink()
+        if self._mode == "lionmesh":
+            self._start_lionmesh()
         else:
             self._start_wifi()
 
@@ -73,20 +73,20 @@ class RadioManager:
     def send(self, payload: bytes, dst: int = 0xFFFF) -> None:
         """
         Send data-plane payload.
-          ghostlink mode: via GhostLink MAC datagram (fire-and-forget)
+          lionmesh mode: via LionMesh MAC datagram (fire-and-forget)
           wifi mode:      UDP broadcast on batman-adv mesh interface
         """
-        if self._mode == "ghostlink" and self._mac:
+        if self._mode == "lionmesh" and self._mac:
             self._mac.send_datagram(payload, dst=dst)
         elif self._mode == "wifi":
             self._send_udp(payload)
 
     def send_reliable(self, payload: bytes, dst: int = 0xFFFF) -> bool:
         """
-        Reliable send with ACK (ghostlink mode only).
+        Reliable send with ACK (lionmesh mode only).
         Falls back to best-effort send in wifi mode.
         """
-        if self._mode == "ghostlink" and self._mac:
+        if self._mode == "lionmesh" and self._mac:
             return self._mac.send_reliable(payload, dst=dst)
         self.send(payload, dst=dst)
         return True   # wifi: assume delivery
@@ -98,20 +98,20 @@ class RadioManager:
     @property
     def status(self) -> dict:
         """Current radio status for the API /status endpoint."""
-        if self._mode == "ghostlink" and self._mac:
+        if self._mode == "lionmesh" and self._mac:
             st = self._mac.get_status()
             return {
-                "mode":         "ghostlink",
+                "mode":         "lionmesh",
                 "mcs":          int(st["mcs"]),
                 "throughput_mbps": st["mbps_est"],
                 "tx_queue":     st["tx_queue"],
             }
         return {"mode": "wifi"}
 
-    # ── GhostLink mode ─────────────────────────────────────────────────────────
+    # ── LionMesh mode ─────────────────────────────────────────────────────────
 
-    def _start_ghostlink(self) -> None:
-        """Initialise GhostLink PHY + MAC via SoapySDR."""
+    def _start_lionmesh(self) -> None:
+        """Initialise LionMesh PHY + MAC via SoapySDR."""
         try:
             import sys, os
             sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'phy'))
@@ -132,7 +132,7 @@ class RadioManager:
                 device_args  = self._cfg.get("radio", "device_args",       fallback="driver=lime"),
             )
 
-            self._radio = XTRXRadio(radio_cfg, rx_callback=self._ghostlink_rx)
+            self._radio = XTRXRadio(radio_cfg, rx_callback=self._lionmesh_rx)
 
             mac_cfg = MACConfig(
                 node_addr = self._node_addr(),
@@ -143,14 +143,14 @@ class RadioManager:
                                  tx_fn  = self._radio.transmit,
                                  on_rx  = self._on_rx)
             self._radio.start()
-            log.info(f"GhostLink PHY started: {bw/1e6:.0f} MHz BW, MCS{mcs}")
+            log.info(f"LionMesh PHY started: {bw/1e6:.0f} MHz BW, MCS{mcs}")
 
         except Exception as e:
-            log.error(f"GhostLink init failed: {e} — falling back to wifi mode")
+            log.error(f"LionMesh init failed: {e} — falling back to wifi mode")
             self._mode = "wifi"
             self._start_wifi()
 
-    def _ghostlink_rx(self, iq: "np.ndarray") -> None:  # type: ignore
+    def _lionmesh_rx(self, iq: "np.ndarray") -> None:  # type: ignore
         """IQ samples from XTRX → MAC layer."""
         if self._mac:
             self._mac.rx_push(iq)

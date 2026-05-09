@@ -1,5 +1,5 @@
 """
-phy_ofdm.py — GhostLink OFDM PHY Layer
+phy_ofdm.py — LionMesh OFDM PHY Layer
 =======================================
 Node-to-node video transmission for LimeSDR hardware (LMS7002M).
 
@@ -1116,10 +1116,10 @@ def rx_mrc(rx0: np.ndarray, rx1: np.ndarray,
 # ═══════════════════════════════════════════════════════
 
 if __name__ == '__main__':
-    print("GhostLink PHY Self-Test")
+    print("LionMesh PHY Self-Test")
     print("=" * 60)
 
-    test_payload = b"GhostLink PHY self-test payload." * 3
+    test_payload = b"LionMesh PHY self-test payload." * 3
     SNR_DB   = 20.0
     N_TRIALS = 5
 

@@ -1,16 +1,16 @@
-# GhostLink Node Configuration
+# LionMesh Node Configuration
 # Copy to node.conf and edit before first run.
 
 [node]
-node_id   = ghostlink-a
-node_name = GHOST-ALPHA
+node_id   = lionmesh-a
+node_name = LION-ALPHA
 mesh_ip   = 10.41.0.1
 mesh_network = 10.41.0.0/16
 
 # ─── Radio mode ───────────────────────────────────────────────────────────────
 # wifi     : Standard WiFi (batman-adv over 802.11s via Alfa adapter)
 #            No LimeSDR required. Data plane = standard 802.11.
-# ghostlink: GhostLink OFDM PHY via LimeSDR (recommended for long range).
+# lionmesh: LionMesh OFDM PHY via LimeSDR (recommended for long range).
 #            Replaces the Alfa adapter. Requires SoapySDR + LimeSDR hardware.
 [radio]
 mode         = wifi
@@ -24,7 +24,7 @@ rx_gain_db   = 40.0
 # ─── WiFi (used when mode = wifi) ────────────────────────────────────────────
 [wifi]
 wifi_interface = wlan0
-mesh_ssid      = GHOSTLINK-MESH
+mesh_ssid      = LIONMESH-MESH
 mesh_channel_2g = 6
 mesh_channel_5g  = 36
 band_switch_threshold_down = -70
@@ -33,7 +33,7 @@ band_switch_threshold_up   = -60
 # ─── LoRa control plane (always active, regardless of radio mode) ─────────────
 [lora]
 lora_port    = /dev/ttyAMA0
-lora_channel = GHOSTLINK
+lora_channel = LIONMESH
 
 # ─── GPS ──────────────────────────────────────────────────────────────────────
 [gps]
@@ -41,7 +41,7 @@ gpsd_host             = localhost
 gpsd_port             = 2947
 gps_broadcast_interval = 30
 
-# ─── Video (GhostLink mode only) ──────────────────────────────────────────────
+# ─── Video (LionMesh mode only) ──────────────────────────────────────────────
 [video]
 enabled      = true
 width        = 1280

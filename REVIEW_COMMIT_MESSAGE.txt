@@ -1,0 +1,8 @@
+Improve project credibility and clarify experimental status
+
+- Rework README to distinguish implemented, experimental and future work
+- Add STATUS.md validation matrix and demo milestones
+- Add GitHub Actions CI for dependency install, compile check and PHY self-test
+- Add rebranding helper to replace remaining LionMesh legacy references
+- Present WiFi mesh as first practical deployment mode
+- Mark custom LimeSDR OFDM PHY as experimental until hardware validation exists

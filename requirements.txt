@@ -1,4 +1,4 @@
-# GhostLink — Python dependencies
+# LionMesh — Python dependencies
 # pip install -r requirements.txt --break-system-packages
 
 # Core PHY (always required)
@@ -16,7 +16,7 @@ meshtastic>=2.3
 pyserial>=3.5
 gpsd-py3>=0.3
 
-# Hardware (optional — only for GhostLink radio mode)
+# Hardware (optional — only for LionMesh radio mode)
 # SoapySDR is installed via apt, not pip:
 #   apt install python3-soapysdr soapysdr-module-lms7
 #   apt install soapysdr-module-xtrx   (for XTRX only)

@@ -5,7 +5,7 @@ Central in-memory store for all known nodes in the mesh.
 
 A node entry is created/updated from two sources:
   - LoRa control plane  → position, discovery, last-seen
-  - GhostLink data plane → link quality, MCS, throughput
+  - LionMesh data plane → link quality, MCS, throughput
 
 Both sources write to the same NodeEntry. The API and WebApp
 read from here to render the Leaflet map and node list.
@@ -33,8 +33,8 @@ class NodeEntry:
     lora_rssi:     Optional[int]   = None
     last_lora_seen: Optional[float] = None   # epoch seconds
 
-    # Data plane (GhostLink or WiFi)
-    radio_mode:    str            = "unknown"   # "ghostlink" or "wifi"
+    # Data plane (LionMesh or WiFi)
+    radio_mode:    str            = "unknown"   # "lionmesh" or "wifi"
     mcs:           Optional[int]  = None
     throughput_mbps: Optional[float] = None
     wifi_rssi:     Optional[int]  = None

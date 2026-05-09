@@ -1,9 +1,9 @@
 """
-daemon/api.py — GhostLink REST API
+daemon/api.py — LionMesh REST API
 =====================================
 FastAPI application served on port 8080.
 
-Merges GATONET's node management API with GhostLink radio status.
+Merges GATONET's node management API with LionMesh radio status.
 
 Endpoints:
   GET  /                  WebApp (Leaflet map)
@@ -39,7 +39,7 @@ _start_time = time.time()
 
 WEBAPP_DIR = Path(__file__).parent.parent / "webapp"
 
-app = FastAPI(title="GhostLink Node API", version="1.0")
+app = FastAPI(title="LionMesh Node API", version="1.0")
 security = HTTPBasic()
 
 app.mount("/static", StaticFiles(directory=str(WEBAPP_DIR / "static")), name="static")
@@ -72,7 +72,7 @@ def verify_admin(creds: HTTPBasicCredentials = Depends(security)):
 @app.get("/")
 async def index(request: Request):
     node_id   = _cfg.get("node", "node_id",   fallback="unknown") if _cfg else "unknown"
-    node_name = _cfg.get("node", "node_name", fallback="GhostLink") if _cfg else "GhostLink"
+    node_name = _cfg.get("node", "node_name", fallback="LionMesh") if _cfg else "LionMesh"
     return templates.TemplateResponse("index.html", {
         "request":    request,
         "node_id":    node_id,
@@ -88,7 +88,7 @@ async def get_status():
     radio  = _radio.status if _radio else {"mode": "unknown"}
 
     node_id   = _cfg.get("node", "node_id",   fallback="unknown") if _cfg else "unknown"
-    node_name = _cfg.get("node", "node_name", fallback="GhostLink") if _cfg else "GhostLink"
+    node_name = _cfg.get("node", "node_name", fallback="LionMesh") if _cfg else "LionMesh"
     mesh_ip   = _cfg.get("node", "mesh_ip",   fallback="—") if _cfg else "—"
 
     return {
@@ -111,7 +111,7 @@ async def get_nodes():
 
 @app.get("/api/radio")
 async def get_radio():
-    """Detailed radio status (GhostLink mode only)."""
+    """Detailed radio status (LionMesh mode only)."""
     if not _radio:
         return {"error": "Radio not initialised"}
     return _radio.status
@@ -138,7 +138,7 @@ async def update_config(update: ConfigUpdate,
 
 @app.post("/api/video/start")
 async def video_start(username: str = Depends(verify_admin)):
-    """Start video TX (GhostLink mode only)."""
+    """Start video TX (LionMesh mode only)."""
     if not _video:
         raise HTTPException(status_code=503, detail="Video not available")
     try:
