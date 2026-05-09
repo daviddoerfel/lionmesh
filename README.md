@@ -1,6 +1,12 @@
 # LionMesh
 
-**Tactical field mesh radio for resilient off-grid video communication.**
+<p align="center">
+  <img src="assets/lionmesh-logo.png" alt="LionMesh tactical mesh radio logo" width="260">
+</p>
+
+<p align="center">
+  <strong>Tactical field mesh radio for resilient off-grid video communication.</strong>
+</p>
 
 No infrastructure. No proprietary MANET radio. No GNU Radio required.
 
@@ -493,3 +499,4 @@ MIT License — Copyright (c) 2026 David Doerfel
 Free to use, modify, and distribute — including for emergency services, civil protection, public-safety research, and technical education.
 
 ---
+
