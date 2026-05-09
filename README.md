@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/lionmesh-logo.png" alt="LionMesh logo" width="220">
+  <img src="assets/lionmesh.png" alt="LionMesh logo" width="220">
 </p>
 
 # LionMesh
