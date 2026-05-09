@@ -1,0 +1,26 @@
+# GhostLink — Python dependencies
+# pip install -r requirements.txt --break-system-packages
+
+# Core PHY (always required)
+numpy>=1.24
+scipy>=1.10
+
+# Node daemon (always required)
+fastapi>=0.110
+uvicorn[standard]>=0.29
+jinja2>=3.1
+python-multipart>=0.0.9
+
+# Control plane (required for LoRa + GPS)
+meshtastic>=2.3
+pyserial>=3.5
+gpsd-py3>=0.3
+
+# Hardware (optional — only for GhostLink radio mode)
+# SoapySDR is installed via apt, not pip:
+#   apt install python3-soapysdr soapysdr-module-lms7
+#   apt install soapysdr-module-xtrx   (for XTRX only)
+
+# Video (optional — only if GStreamer is installed)
+# GStreamer Python bindings are installed via apt:
+#   apt install python3-gst-1.0 gstreamer1.0-plugins-bad gstreamer1.0-libav

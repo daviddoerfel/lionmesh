@@ -1,0 +1,57 @@
+# GhostLink Node Configuration
+# Copy to node.conf and edit before first run.
+
+[node]
+node_id   = ghostlink-a
+node_name = GHOST-ALPHA
+mesh_ip   = 10.41.0.1
+mesh_network = 10.41.0.0/16
+
+# ─── Radio mode ───────────────────────────────────────────────────────────────
+# wifi     : Standard WiFi (batman-adv over 802.11s via Alfa adapter)
+#            No LimeSDR required. Data plane = standard 802.11.
+# ghostlink: GhostLink OFDM PHY via LimeSDR (recommended for long range).
+#            Replaces the Alfa adapter. Requires SoapySDR + LimeSDR hardware.
+[radio]
+mode         = wifi
+device_args  = driver=lime
+freq_hz      = 863000000
+bandwidth_hz = 5000000
+mcs          = 4
+tx_gain_db   = 50.0
+rx_gain_db   = 40.0
+
+# ─── WiFi (used when mode = wifi) ────────────────────────────────────────────
+[wifi]
+wifi_interface = wlan0
+mesh_ssid      = GHOSTLINK-MESH
+mesh_channel_2g = 6
+mesh_channel_5g  = 36
+band_switch_threshold_down = -70
+band_switch_threshold_up   = -60
+
+# ─── LoRa control plane (always active, regardless of radio mode) ─────────────
+[lora]
+lora_port    = /dev/ttyAMA0
+lora_channel = GHOSTLINK
+
+# ─── GPS ──────────────────────────────────────────────────────────────────────
+[gps]
+gpsd_host             = localhost
+gpsd_port             = 2947
+gps_broadcast_interval = 30
+
+# ─── Video (GhostLink mode only) ──────────────────────────────────────────────
+[video]
+enabled      = true
+width        = 1280
+height       = 720
+fps          = 25
+bitrate_kbps = 6000
+source       = v4l2
+device       = /dev/video0
+
+# ─── API / WebApp ─────────────────────────────────────────────────────────────
+[api]
+api_port       = 8080
+admin_password = changeme

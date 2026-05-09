@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GhostLink</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+    <header>
+        <div class="logo">GHOSTLINK</div>
+        <div class="node-id" id="node-id">—</div>
+        <div class="header-radio">
+            <span class="radio-mode-badge" id="radio-mode-badge">—</span>
+        </div>
+        <div class="header-right">
+            <div class="status-dot" id="status-dot"></div>
+            <div class="status-text" id="status-text">Connecting…</div>
+        </div>
+    </header>
+
+    <main>
+
+        <div id="map"></div>
+
+        <aside id="sidebar">
+
+            <section class="panel">
+                <div class="panel-title">Local node</div>
+                <div class="stat-grid">
+                    <span class="stat-label">IP</span>      <span class="stat-val" id="s-ip">—</span>
+                    <span class="stat-label">GPS</span>     <span class="stat-val" id="s-gps">—</span>
+                    <span class="stat-label">Uptime</span>  <span class="stat-val" id="s-uptime">—</span>
+                </div>
+            </section>
+
+            <section class="panel" id="radio-panel">
+                <div class="panel-title">Radio link</div>
+                <div class="stat-grid">
+                    <span class="stat-label">Mode</span>      <span class="stat-val" id="r-mode">—</span>
+                    <span class="stat-label">MCS</span>       <span class="stat-val" id="r-mcs">—</span>
+                    <span class="stat-label">Throughput</span><span class="stat-val" id="r-speed">—</span>
+                    <span class="stat-label">TX queue</span>  <span class="stat-val" id="r-txq">—</span>
+                </div>
+                <div class="mcs-bar-wrap">
+                    <div class="mcs-bar" id="mcs-bar"></div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-title">
+                    Mesh nodes
+                    <span class="badge" id="node-count">0</span>
+                </div>
+                <ul id="node-list"></ul>
+            </section>
+
+            <section class="panel" id="video-panel">
+                <div class="panel-title">Video</div>
+                <div class="video-wrap">
+                    <video id="video-feed" autoplay muted playsinline></video>
+                    <div class="video-overlay" id="video-overlay"><span>No stream</span></div>
+                </div>
+                <div class="video-controls">
+                    <button class="btn green" id="btn-video-start">▶ TX</button>
+                    <button class="btn red"   id="btn-video-stop">■ Stop</button>
+                </div>
+                <input class="url-input" id="rtsp-url" placeholder="udp://@:5601 or rtsp://…"/>
+                <button class="btn muted full" id="btn-rx-connect">Connect RX stream</button>
+            </section>
+
+        </aside>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
