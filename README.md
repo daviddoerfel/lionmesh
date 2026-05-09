@@ -1,4 +1,6 @@
+<p align="center">
 # LionMesh
+</p>
 
 <p align="center">
   <img src="assets/lionmesh.png" alt="LionMesh tactical mesh radio logo" width="260">
@@ -8,11 +10,14 @@
   <strong>Tactical field mesh radio for resilient off-grid video communication.</strong>
 </p>
 
+<p align="center">
 No infrastructure. No proprietary MANET radio. No GNU Radio required.
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-mutedwhite)
 ![Python](https://img.shields.io/badge/Python-3.x-electriccyan)
 ![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%7C%20LimeSDR%20%7C%20LoRa-neonteal)
+
+</p>
 
 ---
 
