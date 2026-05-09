@@ -493,27 +493,3 @@ MIT License — Copyright (c) 2026 David Doerfel
 Free to use, modify, and distribute — including for emergency services, civil protection, public-safety research, and technical education.
 
 ---
-
-## Suggested repository description
-
-```text
-Open-source tactical OFDM mesh radio for resilient off-grid video communication. Built for Raspberry Pi, LoRa, LimeSDR and field deployments. No GNU Radio required.
-```
-
-## Suggested topics
-
-```text
-sdr
-ofdm
-mesh-network
-tactical-communications
-limesdr
-raspberry-pi
-lora
-meshtastic
-batman-adv
-field-communications
-video-streaming
-public-safety
-disaster-response
-```
