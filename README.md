@@ -1,7 +1,7 @@
 # LionMesh
 
 <p align="center">
-  <img src="assets/lionmesh-logo.png" alt="LionMesh tactical mesh radio logo" width="260">
+  <img src="assets/lionmesh.png" alt="LionMesh tactical mesh radio logo" width="260">
 </p>
 
 <p align="center">
