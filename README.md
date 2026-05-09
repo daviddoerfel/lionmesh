@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/ghostlink.png" alt="GhostLink logo" width="220"/>
+
 # GhostLink
 
 **Field mesh radio for off-grid video communication.**
