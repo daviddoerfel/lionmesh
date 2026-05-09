@@ -1,23 +1,18 @@
-<p align="center">
+<div align="center">
+
+<img src="assets/lionmesh.png" alt="lionmesh logo" width="220"/>
+
 # LionMesh
-</p>
 
-<p align="center">
-  <img src="assets/lionmesh.png" alt="LionMesh tactical mesh radio logo" width="260">
-</p>
+**Field mesh radio for off-grid video communication.**
 
-<p align="center">
-  <strong>Tactical field mesh radio for resilient off-grid video communication.</strong>
-</p>
+No infrastructure. No proprietary hardware. No GNU Radio required.
 
-<p align="center">
-No infrastructure. No proprietary MANET radio. No GNU Radio required.
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)]()
+[![Hardware](https://img.shields.io/badge/Hardware-LimeSDR%20%7C%20WiFi-purple.svg)]()
 
-![License: MIT](https://img.shields.io/badge/License-MIT-mutedwhite)
-![Python](https://img.shields.io/badge/Python-3.x-electriccyan)
-![Hardware](https://img.shields.io/badge/Hardware-Raspberry%20Pi%20%7C%20LimeSDR%20%7C%20LoRa-neonteal)
-
-</p>
+</div>
 
 ---
 
