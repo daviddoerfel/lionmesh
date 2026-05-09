@@ -6,7 +6,6 @@ This file tracks the next practical steps required to move LionMesh from prototy
 
 ## 1. Project credibility
 
-- [ ] Add `TODO.md` to the repository
 - [ ] Add `STATUS.md`
 - [ ] Add `TEST_RESULTS.md` once real tests have been performed
 - [ ] Add screenshots of the WebApp to the README
@@ -20,8 +19,6 @@ This file tracks the next practical steps required to move LionMesh from prototy
 
 Goal: prove that LionMesh works with simple, reproducible hardware before extending the SDR layer.
 
-Test setup:
-
 - [ ] Raspberry Pi Node A
 - [ ] Raspberry Pi Node B
 - [ ] WiFi adapter on both nodes
@@ -29,9 +26,6 @@ Test setup:
 - [ ] GPS source on both nodes
 - [ ] Battery or UPS power source
 - [ ] WebApp reachable from at least one client device
-
-Expected result:
-
 - [ ] Node A can see Node B
 - [ ] Node B can see Node A
 - [ ] WebApp displays both nodes
@@ -66,3 +60,209 @@ Latency:
 Packet loss:
 Environment:
 Result:
+```
+
+---
+
+## 4. LoRa / Meshtastic control plane
+
+The LoRa control plane should be validated separately from the data plane.
+
+- [ ] Confirm Meshtastic device connection
+- [ ] Confirm GPS position is available
+- [ ] Broadcast Node A position
+- [ ] Broadcast Node B position
+- [ ] Show both nodes on the WebApp map
+- [ ] Test LoRa-only fallback when WiFi/data plane is down
+- [ ] Document LoRa RSSI / SNR values
+- [ ] Document practical update rate
+- [ ] Add results to `TEST_RESULTS.md`
+
+Minimum result to document:
+
+```text
+Mode: LoRa / Meshtastic
+Nodes: 2
+Distance:
+RSSI:
+SNR:
+GPS update interval:
+Fallback messaging:
+Result:
+```
+
+---
+
+## 5. WebApp validation
+
+The WebApp should become the visible proof that LionMesh is useful in the field.
+
+- [ ] Confirm WebApp starts automatically
+- [ ] Confirm WebApp is reachable at `http://<node-ip>:8080`
+- [ ] Display local node status
+- [ ] Display remote nodes
+- [ ] Display GPS position
+- [ ] Display radio mode
+- [ ] Display link quality
+- [ ] Display online/offline state
+- [ ] Add screenshots to README
+- [ ] Add a short WebApp usage section to README
+
+---
+
+## 6. Video over WiFi
+
+Video should first be validated over WiFi before attempting SDR video transport.
+
+- [ ] Start video stream from Node A
+- [ ] Receive video stream on Node B or client device
+- [ ] Test 720p H.265
+- [ ] Test 1080p H.265
+- [ ] Measure latency
+- [ ] Measure stability
+- [ ] Document CPU load on Raspberry Pi
+- [ ] Document network load
+- [ ] Add results to `TEST_RESULTS.md`
+
+Minimum result to document:
+
+```text
+Mode: WiFi video
+Resolution:
+Codec:
+Bitrate:
+Latency:
+Distance:
+CPU load:
+Stability:
+Result:
+```
+
+---
+
+## 7. SDR PHY simulation
+
+The SDR PHY should remain clearly marked as experimental until hardware tests are complete.
+
+- [ ] Run PHY self-test
+- [ ] Test all MCS levels in simulation
+- [ ] Test all bandwidth settings in simulation
+- [ ] Confirm CRC success rate
+- [ ] Confirm packet success rate
+- [ ] Document simulation results
+- [ ] Add simulation results to `TEST_RESULTS.md`
+
+Minimum result to document:
+
+```text
+Mode: SDR simulation
+Bandwidth:
+MCS:
+Packet count:
+Packet success rate:
+CRC failures:
+Result:
+```
+
+---
+
+## 8. SDR hardware loopback
+
+Before field testing, the LimeSDR / XTRX path should be validated in controlled hardware conditions.
+
+- [ ] Connect LimeSDR Mini 2 or XTRX
+- [ ] Confirm SoapySDR detects the device
+- [ ] Confirm TX stream starts
+- [ ] Confirm RX stream starts
+- [ ] Test low-power loopback
+- [ ] Test controlled over-the-air short-range link
+- [ ] Measure packet success rate
+- [ ] Measure stability over time
+- [ ] Document frequency, bandwidth, gain and antennas
+- [ ] Add results to `TEST_RESULTS.md`
+
+Minimum result to document:
+
+```text
+Mode: SDR hardware loopback
+Hardware:
+Frequency:
+Bandwidth:
+TX gain:
+RX gain:
+MCS:
+Packet success rate:
+Runtime:
+Result:
+```
+
+---
+
+## 9. SDR field validation
+
+Only after simulation and hardware loopback are stable.
+
+- [ ] Test 2.4 GHz at 5 MHz bandwidth
+- [ ] Test 2.4 GHz at 10 MHz bandwidth
+- [ ] Test 2.4 GHz at 20 MHz bandwidth
+- [ ] Measure range with omni antennas
+- [ ] Measure range with directional antennas
+- [ ] Document packet loss
+- [ ] Document usable throughput
+- [ ] Document link recovery behaviour
+- [ ] Avoid making operational claims before results are documented
+
+---
+
+## 10. Regulatory documentation
+
+LionMesh should remain clear and responsible regarding radio regulations.
+
+- [ ] Keep 2.4 GHz as recommended general-use band
+- [ ] Mark 863 MHz wideband mode as restricted / experimental
+- [ ] Avoid presenting 863 MHz 5 MHz OFDM as licence-free general use
+- [ ] Document TX power assumptions
+- [ ] Document antenna assumptions
+- [ ] Document operator responsibility
+- [ ] Add Luxembourg / EU regulatory notes if needed
+
+---
+
+## 11. Documentation improvements
+
+- [ ] Add hardware wiring diagram
+- [ ] Add simple two-node setup guide
+- [ ] Add troubleshooting section
+- [ ] Add known limitations section
+- [ ] Add screenshots
+- [ ] Add architecture diagram as image
+- [ ] Add bill of materials
+- [ ] Add enclosure photos or renderings
+
+---
+
+## 12. Near-term priority list
+
+Recommended order:
+
+1. Prove WiFi / batman-adv mesh with two Raspberry Pis
+2. Prove WebApp node visibility
+3. Prove LoRa / Meshtastic GPS discovery
+4. Prove video over WiFi
+5. Document all results
+6. Only then continue SDR hardware work
+
+---
+
+## Current project maturity
+
+```text
+Concept: strong
+Branding: strong
+Architecture: promising
+WiFi mesh: first practical target
+LoRa control plane: promising
+SDR PHY: experimental
+Field validation: required
+Operational readiness: not yet proven
+```
