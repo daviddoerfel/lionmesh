@@ -1,0 +1,68 @@
+# LionMesh TODO
+
+This file tracks the next practical steps required to move LionMesh from prototype toward a credible field-tested MVP.
+
+---
+
+## 1. Project credibility
+
+- [ ] Add `TODO.md` to the repository
+- [ ] Add `STATUS.md`
+- [ ] Add `TEST_RESULTS.md` once real tests have been performed
+- [ ] Add screenshots of the WebApp to the README
+- [ ] Clearly mark which parts are implemented, experimental, and planned
+- [ ] Add a simple two-node setup guide
+- [ ] Add a known limitations section
+
+---
+
+## 2. Minimal viable field setup
+
+Goal: prove that LionMesh works with simple, reproducible hardware before extending the SDR layer.
+
+Test setup:
+
+- [ ] Raspberry Pi Node A
+- [ ] Raspberry Pi Node B
+- [ ] WiFi adapter on both nodes
+- [ ] LoRa / Meshtastic device on both nodes
+- [ ] GPS source on both nodes
+- [ ] Battery or UPS power source
+- [ ] WebApp reachable from at least one client device
+
+Expected result:
+
+- [ ] Node A can see Node B
+- [ ] Node B can see Node A
+- [ ] WebApp displays both nodes
+- [ ] Basic mesh communication works
+- [ ] System can run without internet
+
+---
+
+## 3. WiFi / batman-adv validation
+
+The WiFi mesh mode should be treated as the first deployable LionMesh mode.
+
+- [ ] Install and configure batman-adv on both nodes
+- [ ] Assign static mesh IPs
+- [ ] Confirm ping between nodes
+- [ ] Measure latency
+- [ ] Measure throughput with `iperf3`
+- [ ] Test range with omni antennas
+- [ ] Test range with improved antennas
+- [ ] Document distance, antenna type, TX power and environment
+- [ ] Add results to `TEST_RESULTS.md`
+
+Minimum result to document:
+
+```text
+Mode: WiFi / batman-adv
+Nodes: 2
+Distance:
+Antenna:
+Throughput:
+Latency:
+Packet loss:
+Environment:
+Result:
