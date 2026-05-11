@@ -159,3 +159,61 @@ async def video_stop(username: str = Depends(verify_admin)):
     if _video:
         _video.stop()
     return {"result": "stopped"}
+
+
+# ── Crypto endpoints ──────────────────────────────────────────────────────────
+
+@app.get("/api/crypto/pubkey")
+async def get_pubkey():
+    """
+    Return this node's Curve25519 public key (hex).
+    Share this with other nodes so they can encrypt frames for this node.
+    """
+    crypto = _radio.status.get('crypto') if _radio else None
+    if crypto is None:
+        # Try getting from registry or radio directly
+        if _radio and hasattr(_radio, '_mac') and _radio._mac:
+            c = _radio._mac.cfg.crypto
+            if c and hasattr(c, 'public_key_hex'):
+                return {
+                    "node_id": _cfg.get("node", "node_id", fallback="unknown")
+                               if _cfg else "unknown",
+                    "pubkey":  c.public_key_hex,
+                }
+    raise HTTPException(status_code=503, detail="Crypto not enabled or not ready")
+
+
+class PeerKey(BaseModel):
+    node_id:    str
+    pubkey_hex: str
+
+
+@app.post("/api/crypto/peers")
+async def add_peer(peer: PeerKey, username: str = Depends(verify_admin)):
+    """
+    Register a peer node's public key.
+    After this, frames sent to that node_id will be ECIES-encrypted.
+
+    Body: {"node_id": "lionmesh-b", "pubkey_hex": "abcdef..."}
+    """
+    if _radio and hasattr(_radio, '_mac') and _radio._mac:
+        crypto = _radio._mac.cfg.crypto
+        if crypto and hasattr(crypto, 'add_peer_hex'):
+            try:
+                crypto.add_peer_hex(peer.node_id, peer.pubkey_hex)
+                log.info(f"Peer key registered: {peer.node_id} by {username}")
+                return {"result": "ok", "node_id": peer.node_id,
+                        "peers": crypto.list_peers()}
+            except Exception as e:
+                raise HTTPException(status_code=400, detail=str(e))
+    raise HTTPException(status_code=503, detail="Crypto not enabled")
+
+
+@app.get("/api/crypto/peers")
+async def list_peers():
+    """List all registered peer node IDs."""
+    if _radio and hasattr(_radio, '_mac') and _radio._mac:
+        crypto = _radio._mac.cfg.crypto
+        if crypto and hasattr(crypto, 'list_peers'):
+            return {"peers": crypto.list_peers()}
+    return {"peers": []}
