@@ -51,6 +51,12 @@ PRIO_CONTROL = 0   # ACK / NACK / PROBE — always goes first
 PRIO_VIDEO   = 1   # DATA datagrams — real-time, drop on congestion
 PRIO_DATA    = 2   # AREQ reliable — can wait
 
+# Fragmentation constants
+FRAG_HDR_FMT  = '>HBB'          # frag_id(2), frag_index(1), frag_total(1)
+FRAG_HDR_SIZE = struct.calcsize(FRAG_HDR_FMT)   # 4 bytes
+FRAG_PAYLOAD  = MAX_PAYLOAD - FRAG_HDR_SIZE      # usable bytes per fragment
+MAX_FRAGS     = 255              # max fragments per message
+
 
 class FType(IntEnum):
     DATA  = 0x01
@@ -109,6 +115,101 @@ class MACFrame:
             for _ in range(8):
                 crc = (crc << 1) ^ 0x1021 if crc & 0x8000 else crc << 1
         return crc & 0xFFFF
+
+
+# ─────────────────────────────────────────────
+# Fragmentation / Reassembly
+# ─────────────────────────────────────────────
+
+def fragment(payload: bytes, frag_id: int) -> list:
+    """
+    Split a large payload into MAC-sized fragments.
+
+    Fragment header (4 bytes prepended to each fragment):
+      [frag_id 2B] [frag_index 1B] [frag_total 1B]
+
+    frag_id    : unique ID per original message (wraps at 65535)
+    frag_index : 0-based index of this fragment
+    frag_total : total number of fragments
+
+    Returns list of bytes objects, each ≤ MAX_PAYLOAD.
+    Payloads that fit in one fragment are returned as-is with a
+    single-fragment header (frag_total=1) for uniform handling.
+    """
+    chunks = [payload[i:i+FRAG_PAYLOAD]
+              for i in range(0, len(payload), FRAG_PAYLOAD)]
+    if len(chunks) > MAX_FRAGS:
+        raise ValueError(f"Payload too large: {len(payload)} bytes requires "
+                         f"{len(chunks)} fragments (max {MAX_FRAGS})")
+    total = len(chunks)
+    frags = []
+    for idx, chunk in enumerate(chunks):
+        hdr  = struct.pack(FRAG_HDR_FMT, frag_id & 0xFFFF, idx, total)
+        frags.append(hdr + chunk)
+    return frags
+
+
+class ReassemblyBuffer:
+    """
+    Reassembles fragmented messages from received MAC frames.
+
+    Usage:
+        buf = ReassemblyBuffer()
+        complete = buf.add(fragment_payload)
+        if complete:
+            handle(complete)
+
+    Incomplete messages are held for max_age_s seconds, then discarded.
+    """
+
+    def __init__(self, max_age_s: float = 2.0):
+        self._max_age = max_age_s
+        # key: frag_id → {'total': N, 'frags': {idx: bytes}, 'ts': float}
+        self._pending: dict = {}
+
+    def add(self, payload: bytes) -> Optional[bytes]:
+        """
+        Add a received fragment payload.
+        Returns the complete reassembled message if all fragments arrived,
+        or None if still waiting for more.
+        """
+        if len(payload) < FRAG_HDR_SIZE:
+            return None
+
+        frag_id, idx, total = struct.unpack(FRAG_HDR_FMT,
+                                             payload[:FRAG_HDR_SIZE])
+        data = payload[FRAG_HDR_SIZE:]
+
+        # Single-fragment message — return immediately
+        if total == 1:
+            return data
+
+        # Multi-fragment — store and check for completion
+        now = time.monotonic()
+        if frag_id not in self._pending:
+            self._pending[frag_id] = {'total': total, 'frags': {}, 'ts': now}
+
+        entry = self._pending[frag_id]
+        entry['frags'][idx] = data
+        entry['ts'] = now
+
+        # Expire stale entries
+        self._expire()
+
+        if len(entry['frags']) == entry['total']:
+            complete = b''.join(entry['frags'][i]
+                                for i in range(entry['total']))
+            del self._pending[frag_id]
+            return complete
+
+        return None
+
+    def _expire(self) -> None:
+        now   = time.monotonic()
+        stale = [k for k, v in self._pending.items()
+                 if now - v['ts'] > self._max_age]
+        for k in stale:
+            del self._pending[k]
 
 
 # ─────────────────────────────────────────────
@@ -244,11 +345,13 @@ class MACLayer:
         self._tx_fn    = tx_fn
         self._on_rx    = on_rx
         self._seq      = 0
+        self._frag_id  = 0                  # fragment message ID counter
         self._amc      = AdaptiveMCS(config.data_mcs)
         self._pending  : Optional[MACFrame] = None
         self._ack_evt  = threading.Event()
         self._rx_lock  = threading.Lock()
         self._phy_rx   = OFDMReceiver()
+        self._reassembly = ReassemblyBuffer()  # defragmentation buffer
 
         self._tx_q     = PriorityTXQueue()
         self._tx_thread = threading.Thread(target=self._tx_worker, daemon=True)
@@ -259,14 +362,17 @@ class MACLayer:
     def send_datagram(self, payload: bytes, dst: int = BCAST_ADDR) -> None:
         """
         Unreliable datagram — for video RTP packets.
-        Non-blocking. Dropped silently if video queue is full (backpressure).
-        Always enqueued at PRIO_VIDEO — never delays ACKs.
+        Automatically fragments payloads larger than FRAG_PAYLOAD bytes.
+        Non-blocking. Fragments dropped silently if video queue is full.
         """
-        if len(payload) > MAX_PAYLOAD:
-            payload = payload[:MAX_PAYLOAD]
-        frame = MACFrame(FType.DATA, self._next_seq(),
-                         self.cfg.node_addr, dst, payload)
-        self._tx_q.put((frame, self.cfg.video_mcs), PRIO_VIDEO, block=False)
+        frags = fragment(payload, self._frag_id)
+        self._frag_id = (self._frag_id + 1) & 0xFFFF
+
+        for frag_data in frags:
+            frame = MACFrame(FType.DATA, self._next_seq(),
+                             self.cfg.node_addr, dst, frag_data)
+            self._tx_q.put((frame, self.cfg.video_mcs),
+                           PRIO_VIDEO, block=False)
 
     def send_reliable(self, payload: bytes, dst: int = BCAST_ADDR) -> bool:
         """
@@ -340,7 +446,10 @@ class MACLayer:
             return
 
         if frame.ftype == FType.DATA:
-            self._on_rx(frame.payload)
+            # Pass through reassembly — handles both single and multi-fragment
+            complete = self._reassembly.add(frame.payload)
+            if complete is not None:
+                self._on_rx(complete)
 
         elif frame.ftype == FType.AREQ:
             # Send ACK immediately at PRIO_CONTROL
