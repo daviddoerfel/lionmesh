@@ -55,3 +55,17 @@ device       = /dev/video0
 [api]
 api_port       = 8080
 admin_password = changeme
+
+# ─── Encryption ───────────────────────────────────────────────────────────────
+# Layer 1: AES-256-GCM on MAC frames (all nodes must share the same key)
+# Layer 2: WireGuard VPN — run setup/05_wireguard.sh separately
+[crypto]
+enabled    = false
+key_dir    = /etc/lionmesh/keys     # node keypair stored here (generated on first run)
+group_psk  = change-this-shared-broadcast-key
+group_salt = lionmesh-ppdr-lux-2026
+
+# Peer public keys:
+# Copy each node's public key hex and add via the API or lionmesh-keytool
+# GET /api/crypto/pubkey  → returns this node public key hex
+# POST /api/crypto/peers  → {node_id, pubkey_hex} to register a peer
