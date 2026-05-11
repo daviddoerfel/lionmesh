@@ -39,8 +39,11 @@ logging.basicConfig(
 )
 log = logging.getLogger("main")
 
-# ── Imports ───────────────────────────────────────────────────────────────────
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# ── Path setup — done once here, not scattered through the file ───────────────
+_ROOT = Path(__file__).parent.parent
+for _p in [str(_ROOT), str(_ROOT / "phy"), str(_ROOT / "control"), str(_ROOT / "daemon")]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
 from daemon.registry import NodeRegistry
 from daemon.radio    import RadioManager
@@ -168,7 +171,6 @@ def main():
     # ── GPS ──
     gps = None
     try:
-        sys.path.insert(0, str(Path(__file__).parent.parent / "control"))
         from control.gps import GpsManager
         gps = GpsManager()
         gps.connect()
@@ -195,12 +197,14 @@ def main():
         # Wire up incoming LoRa packets → registry
         def on_lora_rx(packet, interface):
             try:
-                pos = packet.get("decoded", {}).get("position", {})
+                pos     = packet.get("decoded", {}).get("position", {})
                 node_id = str(packet.get("fromId", "unknown"))
                 if pos.get("latitude"):
                     registry.update_from_lora(
                         node_id   = node_id,
-                        node_name = packet.get("decoded", {}).get("user", {}).get("longName", node_id),
+                        node_name = packet.get("decoded", {})
+                                          .get("user", {})
+                                          .get("longName", node_id),
                         lat       = pos["latitude"],
                         lon       = pos["longitude"],
                         alt       = pos.get("altitude", 0),
@@ -210,7 +214,18 @@ def main():
                 log.debug(f"LoRa packet parse error: {err}")
 
         if lora.interface:
-            lora.interface.localNode.onReceive = on_lora_rx
+            # Meshtastic ≥2.3: use pub/sub instead of direct attribute assignment
+            try:
+                from pubsub import pub
+                pub.subscribe(on_lora_rx, "meshtastic.receive")
+                log.info("LoRa RX subscribed via pubsub")
+            except Exception:
+                # Fallback for older meshtastic versions
+                try:
+                    lora.interface.localNode.onReceive = on_lora_rx
+                    log.info("LoRa RX wired via onReceive (legacy)")
+                except Exception as e2:
+                    log.warning(f"LoRa RX wiring failed: {e2}")
 
     except Exception as e:
         log.warning(f"LoRa unavailable: {e} — control plane disabled")
